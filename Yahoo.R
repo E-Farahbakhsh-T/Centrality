@@ -196,16 +196,16 @@ for (j in 1:totaltime)
   
   #getting the weighted adjucency matrix for the mst
   # this is the upperside of the matrix so we + with its transpose
-  mstadj = get.adjacency(mstnet, type = c("upper"), attr = NULL, names = TRUE, edges = TRUE)
-  mstadj = mstadj + t(mstadj)
+  #mstadj = get.adjacency(mstnet, type = c("upper"), attr = NULL, names = TRUE, edges = TRUE)
+  #mstadj = mstadj + t(mstadj)
   
   maxdist = c()
-  distanceMatrix<- distances(mstnet)
+  distanceMatrix <- distances(mstnet)
   for (i in 1:c)
   {
-    maxdist<- append(maxdist,max(distanceMatrix[i,]))
+    maxdist<- append(maxdist, max(distanceMatrix[i,]))
   }
-  center <- append(center,which.min(maxdist))
+  center <- append(center, which.min(maxdist))
   #print(which.min(maxdist))
 }
   
