@@ -1,4 +1,4 @@
-#We need to clean the data
+# Elena Farahbakhsh
 
 rm(list = ls())
  
@@ -12,7 +12,7 @@ AZN.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/AZN.ST.csv")
 BOL.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/BOL.ST.csv")
 ELUX.B.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/ELUX.B.ST.csv")
 ERIC.B.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/ERIC.B.ST.csv")
-#### 987 column ESSITY.B.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/ESSITY.B.ST.csv")
+#### 987 rows ESSITY.B.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/ESSITY.B.ST.csv")
 EVO.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/EVO.ST.csv")
 GETI.B.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/GETI.B.ST.csv")
 HEXA.B.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/HEXA.B.ST.csv")
@@ -76,7 +76,6 @@ DataMatrix = cbind(ABB.ST.Adj ,
                    BOL.ST.Adj ,
                    ELUX.B.ST.Adj ,
                    ERIC.B.ST.Adj,
-                   ESSITY.B.ST.Adj ,
                    EVO.ST.Adj ,
                    GETI.B.ST.Adj ,
                    HEXA.B.ST.Adj ,
@@ -109,13 +108,31 @@ DataMatrix <- matrix(data=DataMatrix, ncol=c, nrow=r)
 # in the following for each column we find non numerical and remove the row:
 for (i in 1:c)
 {
-  DataMatrix=DataMatrix[!is.na(DataMatrix[,i]),]
+  DataMatrix = DataMatrix[!is.na(DataMatrix[,i]),]
 }
+
 
 # just the # of rows differs, so we find it again
 r = dim(DataMatrix)[1]
-#### Now, we have the data as a matrix of numbers
 
+SimpleReturnDataMatrix <- matrix(0, nrow=r-1, ncol=c)
+
+for (i in 1:r-1)
+{
+  SimpleReturnDataMatrix[i,] = (DataMatrix[i+1,]-DataMatrix[i,])/DataMatrix[i,]
+}
+r = dim(SimpleReturnDataMatrix)[1]
+write.csv(SimpleReturnDataMatrix, "/Users/asanapple/Desktop/Research/21-05-01/simplereturnmatrix")
+#### Now, we have the data as a matrix of numbers
+LogReturnDataMatrix = matrix(0, nrow=r, ncol=c)
+for(i in 1:r)
+{
+  for(j in 1:c)
+  {
+    LogReturnDataMatrix <- log(1+SimpleReturnDataMatrix)
+  }
+  
+}
 w = 252 # for one year without holidays
 totaltime = r - w + 1
 
@@ -125,10 +142,10 @@ for (k in 1:c)
 {
   for (i in 1:(totaltime))
   {
-    S[k, i, ] = DataMatrix[i:(i+w-1), k]
+    S[k, i, ] = SimpleReturnDataMatrix[i:(i+w-1), k] # if we want the log return we just need to change this to LogReturnDataMatrix
   }
 }
-
+# about simple return and log return look at https://www.youtube.com/watch?v=LpzXmhJe93s
 
 
 ro <- function(s1,s2) {
@@ -174,6 +191,35 @@ for(i in 1:totaltime)
 library(igraph)
 install.packages(igraph)
 
+dict <-  c("ABB.ST.Adj",
+           "ALFA.ST.Adj",
+           "ALIV.SDB.ST.Adj",
+           "ASSA.B.ST.Adj",
+           "ATCO.A.ST.Adj",
+           "ATCO.B.ST.Adj",
+           "AZN.ST.Adj",
+           "BOL.ST.Adj",
+           "ELUX.B.ST.Adj",
+           "ERIC.B.ST.Adj",
+           "EVO.ST.Adj",
+           "GETI.B.ST.Adj",
+           "HEXA.B.ST.Adj",
+           "HM.B.ST.Adj",
+           "INVE.B.ST.Adj",
+           "NDA.SE.ST.Adj",
+           "SAND.ST.Adj",
+           "SCA.B.ST.Adj",
+           "SEB.A.ST.Adj",
+           "SECU.B.ST.Adj",
+           "SHB.A.ST.Adj",
+           "SKA.B.ST.Adj",
+           "SKF.B.ST.Adj",
+           "SWED.A.ST.Adj",
+           "SWMA.ST.Adj",
+           "TEL2.B.ST.Adj",
+           "TELIA.ST.Adj",
+           "VOLV.B.ST.Adj")
+
 
 # every time we want to find the center of the mst of a graph
 center = c()
@@ -189,7 +235,7 @@ for (j in 1:totaltime)
   #plot.igraph(net,vertex.label=V(net)$name,layout=layout.fruchterman.reingold, edge.color="black",edge.width=E(net)$weight)
   
   # finding the min spanning tree
-  mstnet=minimum.spanning.tree(net)
+  mstnet = minimum.spanning.tree(net)
   
   # plot the mst graph
   #plot.igraph(mstnet,vertex.label=V(net)$name,layout=layout.fruchterman.reingold, edge.color="black",edge.width=E(net)$weight)
@@ -205,14 +251,18 @@ for (j in 1:totaltime)
   {
     maxdist<- append(maxdist, max(distanceMatrix[i,]))
   }
-  center <- append(center, which.min(maxdist))
+  t = which.min(maxdist)
+  center <- append(center, dict[[t]])
   #print(which.min(maxdist))
 }
   
 center
 
+write.csv(center, file = "/Users/asanapple/Desktop/Research/21-05-01/Simplereturncenters.csv")
+
+# The code has been completed but the only problem is that I assumed every mst has just one center. we can check at print(which.min(maxdist)).
 
 
-#Just if you see the length of the center is not totaltime because there are some unknown in the data. For ex ABB.ST.Adj[1161]
-# Annars the code has been completed but the only problem is that I assumed every mst has just one center. we can check at print(which.min(maxdist)).
+
+
 
