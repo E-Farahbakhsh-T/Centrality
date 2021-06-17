@@ -15,7 +15,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   
   for (i in 1:r-1)
   {
-    SimpleReturnDataMatrix[i,] = (DataMatrix[i,] - DataMatrix[i+1,])/DataMatrix[i+1,]
+    SimpleReturnDataMatrix[i,] = (DataMatrix[i+1,] - DataMatrix[i,])/DataMatrix[i,]
   }
   r = dim(SimpleReturnDataMatrix)[1]
   
@@ -48,7 +48,8 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   {
     for(j in 1:c)
     {   
-      for(k in 1:c){
+      for(k in 1:c)
+        {
         roMatrix[i,j,k] = ro(S[j,i,],S[k,i,])
       }
     }
@@ -114,8 +115,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     }
     t <- which(maxdist == min(maxdist))
     center <- append(center, dict[[t]])
-    #reverse of the center should be the center, because the matrix that we consider DataMatrix[,1] is the first row but it is the newest time. 
-    center <- rev(center)
+    
     #center <- append(center, t)
     #print(which.min(maxdist))
     
@@ -127,7 +127,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
       distancefromstar <- append(distancefromstar, 0)
     }
     
-    distancefromstar <- rev(distancefromstar) # the same reason as center
+   
     # for (i in 1:c)
     # {
     #   if (degreevec[[i]]>1)
