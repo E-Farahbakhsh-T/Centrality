@@ -114,6 +114,8 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     }
     t <- which(maxdist == min(maxdist))
     center <- append(center, dict[[t]])
+    #reverse of the center should be the center, because the matrix that we consider DataMatrix[,1] is the first row but it is the newest time. 
+    center <- rev(center)
     #center <- append(center, t)
     #print(which.min(maxdist))
     
@@ -125,6 +127,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
       distancefromstar <- append(distancefromstar, 0)
     }
     
+    distancefromstar <- rev(distancefromstar) # the same reason as center
     # for (i in 1:c)
     # {
     #   if (degreevec[[i]]>1)
@@ -133,7 +136,6 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     #     }
     # }
     # distancefromstar <- append(distancefromstar, mycomination(degreevec[[t]],2)/sumcom)
-    
     
   }
    
