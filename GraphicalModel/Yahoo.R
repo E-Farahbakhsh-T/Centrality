@@ -29,7 +29,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   {
     for (i in 1:(totaltime))
     {
-      S[k, i, ] = SimpleReturnDataMatrix[i:(i+w-1), k] # if we want the log return we just need to change this to LogReturnDataMatrix
+      S[k, i, ] = SimpleReturnDataMatrix[i:(i+w-1), k] 
     }
   }
   # about simple return and log return look at https://www.youtube.com/watch?v=LpzXmhJe93s
@@ -184,7 +184,7 @@ LogReturnFunction <- function(DataMatrix, dict)
   {
     for (i in 1:(totaltime))
     {
-      S[k, i, ] = LogReturnDataMatrix[i:(i+w-1), k] # if we want the log return we just need to change this to LogReturnDataMatrix
+      S[k, i, ] = LogReturnDataMatrix[i:(i+w-1), k] 
     }
   }
   # about simple return and log return look at https://www.youtube.com/watch?v=LpzXmhJe93s
