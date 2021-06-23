@@ -1,5 +1,8 @@
 
 
+# For hierarchical Clustering 
+# http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning
+# https://stackoverflow.com/questions/20343398/how-to-use-hclust-as-function-call-in-r
 
 rm(list = ls())
 source("Yahoo.R") # for calling functions in Yahoo.R
@@ -44,10 +47,16 @@ FinancialServicesMatrix <- DataMatrix[, c( 15, 16, 19, 21, 24)] #19
 ConsumerDefensiveMatrix <- DataMatrix[, c(25)]
 dictFinancialServices<- c(15, 16, 19, 21, 24)
 
-LogReturnFunction(FinancialServicesMatrix, dictFinancialServices)
+
+plot(SimpleReturnFunction(FinancialServicesMatrix, dictFinancialServices)[[2]])
+data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
+plot(SimpleReturnFunction(ConsumerCyclicalMatrix, c(3,11,14)))
 
 Alldata <- SimpleReturnFunction(DataMatrix, c(1:columnno))
 
+frequency = table(Alldata)
+plot(frequency)
+plot(Alldata)
 # If you want to print them
 #write.csv(Alldata, file = "/Users/asanapple/Desktop/Research/21-05-01/Logreturncenters.csv")
 
@@ -80,3 +89,16 @@ Alldata <- SimpleReturnFunction(DataMatrix, c(1:columnno))
 #            "TEL2.B.ST.Adj",
 #            "TELIA.ST.Adj",
 #            "VOLV.B.ST.Adj")
+data1<- SimpleReturnFunction(FinancialServicesMatrix, c( 15, 16, 19, 21, 24))
+data <- SimpleReturnFunction(DataMatrix, c(1:columnno))
+plot(data1)
+frequency = table(data1)
+plot(frequency)
+plot(Alldata)
+
+
+
+plot(data1[[4]], pch="+")
+
+data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
+
