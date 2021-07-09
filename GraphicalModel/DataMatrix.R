@@ -1,5 +1,5 @@
 
-
+rm(list = ls())
 
 ABB.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/ABB.ST.csv")
 ALFA.ST = read.csv("/Users/asanapple/Desktop/Research/21-05-01/ALFA.ST.csv")

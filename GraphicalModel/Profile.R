@@ -50,10 +50,10 @@ dictFinancialServices<- c(15, 16, 19, 21, 24)
 
 plot(SimpleReturnFunction(FinancialServicesMatrix, dictFinancialServices)[[2]])
 data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
-plot(SimpleReturnFunction(ConsumerCyclicalMatrix, c(3,11,14)))
+plot(SimpleReturnFunction(ConsumerCyclicalMatrix, c(3,11,14))[[1]])
 
 Alldata <- SimpleReturnFunction(DataMatrix, c(1:columnno))
-
+plot(Alldata[[4]], pch="*",type = "b") # type = b connected
 frequency = table(Alldata)
 plot(frequency)
 plot(Alldata)
@@ -89,7 +89,7 @@ plot(Alldata)
 #            "TEL2.B.ST.Adj",
 #            "TELIA.ST.Adj",
 #            "VOLV.B.ST.Adj")
-data1<- SimpleReturnFunction(FinancialServicesMatrix, c( 15, 16, 19, 21, 24))
+data1<- SimpleReturnFunction(FinancialServicesMatrix, c( 15, 16, 19, 21, 24))[[1]]
 data <- SimpleReturnFunction(DataMatrix, c(1:columnno))
 plot(data1)
 frequency = table(data1)
@@ -101,4 +101,5 @@ plot(Alldata)
 plot(data1[[4]], pch="+")
 
 data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
+
 

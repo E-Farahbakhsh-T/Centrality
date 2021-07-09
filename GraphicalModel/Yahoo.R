@@ -4,8 +4,21 @@
 
 mycomination <- function(n,c)
 {
-  factorial(n)/(factorial(c)*factorial(n-c))
+  if (n<c)
+    {return (0)}
+  else
+    {return(factorial(n)/(factorial(c)*factorial(n-c)))}
 }
+
+#Mod(n,m)
+mymod <- function(n,m)
+{
+  return(n- m * (n %/% m))
+}
+
+
+# returns 4 items: 
+#center,distancefromstar, dMatrix, treedistance
 
 SimpleReturnFunction <- function(DataMatrix, dict)
 {
@@ -140,12 +153,9 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     # }
     
    
-    for (i in 1:c)
+    for (u in 1:c)
     {
-      if (degreevec[[i]]>1)
-      {
-        sumcom <- sumcom + mycomination(degreevec[[i]],2)
-        }
+       sumcom <- sumcom + mycomination(degreevec[[u]], 2)
     }
     distancefromstar <- append(distancefromstar, mycomination(degreevec[[t]],2)/sumcom)
     
@@ -155,7 +165,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     # we should change the dmatrix to be dissimilarity matrix
     
     
-    if (j>1)
+    if (j>1 && mymod(j,1) ==1) # mymod is for considering distance between trees at each period of time like 10, 20 and 30 days
     {
       fit2 <- fit1
       fit1 <- hclust(as.dist(dMatrix[j,,]), method = "single", members = NULL)
@@ -173,7 +183,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   
   # The code has been completed but the only problem is that I assumed every mst has just one center. we can check at print(which.min(maxdist)).
   
-  newlist <- list(center,distancefromstar, dMatrix, dista)# dista for distance between clustering
+  newlist <- list(center, distancefromstar, dMatrix, dista)# dista for distance between clustering
   return(newlist)
 
 
