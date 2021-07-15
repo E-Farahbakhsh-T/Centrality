@@ -1,6 +1,79 @@
 # Elena Farahbakhsh
 # The code has been completed but the only problem is that I assumed every mst has just one center. 
  
+LocalClusteringCoefficient<- function(dmatrix,index) # dmatrix
+{
+  deg <- 0 
+  triangles <- 0 
+  set<- c()
+  columns<- length(dmatrix[1,])
+  i <- index
+  for (j in seq(columns) [-i])
+  {
+    if (dmatrix[i,j]>0)
+    {
+      deg<- deg + 1
+      set <- append(set, j)
+    }
+  }
+  if(deg>1)
+  {
+    for (s in 1:(length(set)-1))
+    {
+      for (ts in (s+1):length(set))
+      {
+        
+        if(dmatrix[set[s],set[ts]] > 0)
+        {
+          triangles <- triangles + 1
+        }
+      }
+    }
+    return(triangles/mycomination(deg,2))
+  }else
+  {
+    return(-1)
+  }
+}
+
+
+# for a given matrix it finds the ClusteringCoefficient
+ClusteringCoefficient<- function(dmatrix) # dmatrix
+{
+  triples <- 0 
+  triangles <- 0 
+  columns<- length(dmatrix[1,])
+  for (i in 1:columns)
+  {
+    ex<- i
+    for (j in seq(columns) [-ex])
+    {
+      if (dmatrix[i,j]>0)
+      {
+        ex1<- c(i,j)
+        for (f in seq(columns)[-ex1])
+        {
+          if(dmatrix[j,f]>0)
+          {
+            triples <- triples +1
+            if(dmatrix[i,f]>0)
+            {
+              triangles <- triangles +1
+            }
+          }
+        }
+      }
+    }
+  }
+  if (triples == 0 )
+  {
+    return(-1)
+  }else
+  {
+    return(triangles/triples)
+  }
+}
+
 
 mycomination <- function(n,c)
 {
@@ -18,10 +91,11 @@ mymod <- function(n,m)
 
 
 # returns 4 items: 
-#center,distancefromstar, dMatrix, treedistance
+#center,distancefromstar, dMatrix, treedistance, clustering coefficient
 
 SimpleReturnFunction <- function(DataMatrix, dict)
 {
+  theta = 0.8
   r = dim(DataMatrix)[1]
   c = dim(DataMatrix)[2]
   SimpleReturnDataMatrix <- matrix(0, nrow=r-1, ncol=c)
@@ -64,7 +138,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
       for(k in 1:c)
         {
         r1 <- ro(S[j,i,],S[k,i,])
-        if (r1<=1 && r1>=-1)
+       # if (r1<=theta1 && r1>=-(theta2))
         {
           roMatrix[i,j,k] = ro(S[j,i,],S[k,i,])
         }
@@ -85,7 +159,10 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     {   
       for(k in 1:c)
         {
-        dMatrix[i,j,k] = sqrt(2*(1-roMatrix[i,j,k]))
+        if (roMatrix[i,j,k] < theta)
+        {
+          dMatrix[i,j,k] = sqrt(2*(1-roMatrix[i,j,k]))
+        }
       }
     }
   }
@@ -111,10 +188,16 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   distancefromstar = c()
   fit1 <- hclust(as.dist(dMatrix[1,,]), method = "single", members = NULL)
   dista <- c()
+  cc <- c()
+  LCC <- c()
   
   for (j in 1:totaltime)
   {
+    
     net = graph.adjacency(dMatrix[j,,],mode="undirected",weighted=TRUE,diag=FALSE)
+    cc = append(cc,ClusteringCoefficient(dMatrix[j,,]))
+    
+    
     diam  <-  append(diam, diameter(net))
     
     # we can plot here but we behöver inte
@@ -138,7 +221,10 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     {
       maxdist<- append(maxdist, max(distanceMatrix[i,]))
     }
-    t <- which(maxdist == min(maxdist))
+    s <- which(maxdist == min(maxdist))
+    t=s[[1]]
+    
+    LCC<- append(LCC,LocalClusteringCoefficient(dMatrix[j,,],t))
     center <- append(center, dict[t])
     
     #center <- append(center, t)
@@ -160,12 +246,11 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     distancefromstar <- append(distancefromstar, mycomination(degreevec[[t]],2)/sumcom)
     
     
-    
     # Now er work on dMatrix
     # we should change the dmatrix to be dissimilarity matrix
     
     
-    if (j>1 && mymod(j,1) ==1) # mymod is for considering distance between trees at each period of time like 10, 20 and 30 days
+    if (j>1 && mymod(j,1) == 0) # mymod is for considering distance between trees at each period of time like 10, 20 and 30 days
     {
       fit2 <- fit1
       fit1 <- hclust(as.dist(dMatrix[j,,]), method = "single", members = NULL)
@@ -183,7 +268,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   
   # The code has been completed but the only problem is that I assumed every mst has just one center. we can check at print(which.min(maxdist)).
   
-  newlist <- list(center, distancefromstar, dMatrix, dista)# dista for distance between clustering
+  newlist <- list(center, distancefromstar, dMatrix, dista,cc,LCC)# dista for distance between clustering
   return(newlist)
 
 
@@ -313,9 +398,6 @@ LogReturnFunction <- function(DataMatrix, dict)
 
   
 }
-
-
-
 
 
 
