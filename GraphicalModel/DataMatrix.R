@@ -64,8 +64,10 @@ TEL2.B.ST.Adj = TEL2.B.ST$Adj.Close
 TELIA.ST.Adj = TELIA.ST$Adj.Close
 VOLV.B.ST.Adj = VOLV.B.ST$Adj.Close
 
+Dates <- ABB.ST$Date
 
-DataMatrix = cbind(ABB.ST.Adj ,
+DataMatrix = cbind(Dates,
+                   ABB.ST.Adj ,
                    ALFA.ST.Adj,
                    ALIV.SDB.ST.Adj,
                    ASSA.B.ST.Adj,
@@ -101,13 +103,17 @@ DataMatrix
 r = dim(DataMatrix)[1]
 c = dim(DataMatrix)[2]
 
-# the data in the matrix are charachters so we change to numbers
-DataMatrix <- mapply(DataMatrix, FUN =as.numeric)
+# # the data in the matrix are charachters so we change to numbers
+DataMatrix[,2:c] <- mapply(DataMatrix[,2:c], FUN =as.numeric)
 DataMatrix <- matrix(data=DataMatrix, ncol=c, nrow=r)
 # in the following for each column we find non numerical and remove the row:
-for (i in 1:c)
+for (i in 2:c) # from 2 because the first column is just the date
 {
   DataMatrix = DataMatrix[!is.na(DataMatrix[,i]),]
 }
 
-write.csv(DataMatrix, "/Users/asanapple/Desktop/Research/21-05-01/DataMatrix",row.names=F)
+
+
+write.csv(DataMatrix, "/Users/asanapple/Desktop/Research/21-05-01/DataMatrixdated",row.names=F)
+
+

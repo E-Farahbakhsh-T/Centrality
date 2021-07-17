@@ -5,7 +5,7 @@
 # https://stackoverflow.com/questions/20343398/how-to-use-hclust-as-function-call-in-r
 
 rm(list = ls())
-source("Yahoo.R") # for calling functions in Yahoo.R
+source("/Users/asanapple/Desktop/Research/GraphicalModel/Yahoo.R") # for calling functions in Yahoo.R
 dict <-  c("ABB.ST.Adj",# Industrials,1
            "ALFA.ST.Adj", # Industrials,2
            "ALIV.SDB.ST.Adj", # Consumer Cyclical,3
@@ -35,7 +35,18 @@ dict <-  c("ABB.ST.Adj",# Industrials,1
            "TELIA.ST.Adj", # Communication Services,27
            "VOLV.B.ST.Adj") # Industrials,28
 
-DataMatrix = read.csv("/Users/asanapple/Desktop/Research/21-05-01/DataMatrix")
+DataMatrix_dated = read.csv("/Users/asanapple/Desktop/Research/21-05-01/DataMatrixdated")
+
+# changing dates to Date format otherwise it is just string
+Dates = DataMatrix_dated[,1]
+aDates<-as.factor(Dates)
+#str(aDates)
+bDates<-as.Date(aDates,format="%Y-%m-%d") #defining what is the desired format of your date
+#str(bDates)
+
+
+DataMatrix = DataMatrix_dated[,2:dim(DataMatrix_dated)[2]]
+
 DataMatrix <- mapply(DataMatrix, FUN =as.numeric)
 columnno = dim(DataMatrix)[2]
 IndustrialsDatamatrix <-  DataMatrix[, c(1,2,4,5,6,17,20,22,23,28)] # 17
@@ -53,7 +64,46 @@ data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
 plot(SimpleReturnFunction(ConsumerCyclicalMatrix, c(3,11,14))[[1]])
 
 Alldata <- SimpleReturnFunction(DataMatrix, c(1:columnno))
-plot(Alldata[[6]], pch="*") # type = b connected
+
+
+# I want to plot this 
+library(ggplot2)
+#What we want to plot(WWWP)
+
+
+# thsi part is for considering distance between clustering and mymod(i,10)==1 is when we compare every 10 days 
+# mymod(i,1)==0 when we consider all the days.
+
+sett<- c()
+for(i in 1: 1004)
+{
+  if (mymod(i,1)==0)
+  {
+    sett <- append(sett, i)
+  }
+}
+sett <- sett[1: (length(sett)-1)]
+
+WWWP <- Alldata[[4]]
+#database<- cbind(bDates[1:(length(WWWP) - 1)], WWWP )
+database<- cbind(bDates[c(sett)], WWWP ) # just for distance bet trees in 30 days
+
+
+my_DB <- as.data.frame(database)
+ggplot(
+  my_DB, aes(x = bDates[c(sett)], y = WWWP )) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Date",
+       y = " ",
+       title = " ",
+       subtitle = " ")
+
+
+
+
+
+plot(Alldata[[4]], pch="*",type = "b") # type = b connected
 # plot(Alldata[[6]], pch="*",type = "b") # type = b connected
 frequency = table(Alldata)
 plot(frequency)
@@ -94,3 +144,5 @@ plot(Alldata)
 data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
 
 
+
+Date = read.delim("/Users/asanapple/Desktop/Dates.txt.rtf")

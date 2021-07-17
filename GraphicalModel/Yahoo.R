@@ -95,7 +95,7 @@ mymod <- function(n,m)
 
 SimpleReturnFunction <- function(DataMatrix, dict)
 {
-  theta = 0.8
+  theta = 2
   r = dim(DataMatrix)[1]
   c = dim(DataMatrix)[2]
   SimpleReturnDataMatrix <- matrix(0, nrow=r-1, ncol=c)
@@ -250,7 +250,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     # we should change the dmatrix to be dissimilarity matrix
     
     
-    if (j>1 && mymod(j,1) == 0) # mymod is for considering distance between trees at each period of time like 10, 20 and 30 days
+    if (j>1 && mymod(j,1) == 0) # mymod is for considering distance between trees at each period of time like 10, 20 and 30 days mymod(j,10) == 1
     {
       fit2 <- fit1
       fit1 <- hclust(as.dist(dMatrix[j,,]), method = "single", members = NULL)
