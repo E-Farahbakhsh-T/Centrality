@@ -1,7 +1,50 @@
 # Elena Farahbakhsh
 # The code has been completed but the only problem is that I assumed every mst has just one center. 
- 
-LocalClusteringCoefficient<- function(dmatrix,index) # dmatrix
+
+RelativeClusteringCoefficient<- function(dmatrix, mainMatrix)
+{
+  triples <- 0 
+  triangles <- 0 
+  columns<- length(dmatrix[1,])
+  for (i in 1:columns)
+  {
+    ex<- i
+    for (j in seq(columns) [-ex])
+    {
+      if (dmatrix[i,j]>0)
+      {
+        ex1<- c(i,j)
+        for (f in seq(columns)[-ex1])
+        {
+          if(dmatrix[j,f]>0)
+          {
+            if(mainMatrix[i,f]<1)
+            {
+              if (dmatrix[i,f] >0)
+              {
+                triangles <- triangles +1
+              }else
+              {
+                triples <- triples +1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if ((triangles+triples) == 0 )
+  {
+    return(-1)
+  }else
+  {
+    return(triangles/(triangles+triples))
+  }
+  
+  
+}
+
+LocalClusteringCoefficient<- function(dmatrix, index) # dmatrix
 {
   deg <- 0 
   triangles <- 0 
@@ -35,7 +78,6 @@ LocalClusteringCoefficient<- function(dmatrix,index) # dmatrix
     return(-1)
   }
 }
-
 
 # for a given matrix it finds the ClusteringCoefficient
 ClusteringCoefficient<- function(dmatrix) # dmatrix
@@ -74,13 +116,12 @@ ClusteringCoefficient<- function(dmatrix) # dmatrix
   }
 }
 
-
 mycomination <- function(n,c)
 {
   if (n<c)
-    {return (0)}
+  {return (0)}
   else
-    {return(factorial(n)/(factorial(c)*factorial(n-c)))}
+  {return(factorial(n)/(factorial(c)*factorial(n-c)))}
 }
 
 #Mod(n,m)
@@ -89,13 +130,21 @@ mymod <- function(n,m)
   return(n- m * (n %/% m))
 }
 
-
-# returns 4 items: 
-#center,distancefromstar, dMatrix, treedistance, clustering coefficient
-
-SimpleReturnFunction <- function(DataMatrix, dict)
+dfunction <- function(s)
 {
-  theta = 2
+  #return (sqrt(2*(1-(s))))
+  return (1-s^2)
+  #return (1-abs(s))
+}
+
+ro <- function(s1,s2) 
+{
+  s <- cov(s1,s2)/(sqrt(var(s1)*var(s2)))
+  return(s)
+}
+
+findingSMatrix<- function(DataMatrix,w)
+{
   r = dim(DataMatrix)[1]
   c = dim(DataMatrix)[2]
   SimpleReturnDataMatrix <- matrix(0, nrow=r-1, ncol=c)
@@ -107,11 +156,11 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   r = dim(SimpleReturnDataMatrix)[1]
   
   #### Now, we have the data as a matrix of numbers
-  w = 252 # for one year without holidays
+  
   totaltime = r - w + 1
   
   S <- array(0, dim=c(c, totaltime, w))
-    
+  
   for (k in 1:c)
   {
     for (i in 1:(totaltime))
@@ -120,54 +169,88 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     }
   }
   # about simple return and log return look at https://www.youtube.com/watch?v=LpzXmhJe93s
-  
-  
-  ro <- function(s1,s2) {
-     cov(s1,s2)/(sqrt(var(s1)*var(s2)))
-  }
-  
-  
-  
+  return(S)
+}
+
+findingroMatrix<- function(S, totaltime,c)
+{
   #Now we have totaltime = r - w + 1 times for each time we consider a graph or matrix at least
   roMatrix  <- array(0, dim = c(totaltime, c, c))
-  
-  for(i in 1:totaltime)
+  for(i in 1:totaltime-1)
   {
     for(j in 1:c)
     {   
       for(k in 1:c)
-        {
+      {
         r1 <- ro(S[j,i,],S[k,i,])
-       # if (r1<=theta1 && r1>=-(theta2))
+        # if (r1<=theta1 && r1>=-(theta2))
         {
-          roMatrix[i,j,k] = ro(S[j,i,],S[k,i,])
+          roMatrix[i,j,k] = r1
         }
       }
     }
   }
-  
-  
-  
-  ## till now we have made a matrix roMatrix such that roMatrix[1,,] indicates the first graph and so on
-  
-  ## Now we construct dMatrix
-  
+  return (roMatrix)
+}
+
+findingdMatrix <- function(sMatrix, totaltime,c, theta)
+{
   dMatrix  <- array(0, dim = c(totaltime, c, c))
   for(i in 1:totaltime)
   {
     for(j in 1:c)
     {   
       for(k in 1:c)
+      {
+        df <- sMatrix[i,j,k]
+        if (df < theta)
         {
-        if (roMatrix[i,j,k] < theta)
+          dMatrix[i,j,k] = df
+        }
+      }
+    }
+  }
+  return (dMatrix)
+}
+
+
+# returns 4 items: 
+#center,distancefromstar, dMatrix, treedistance, clustering coefficient
+SimpleReturnFunction <- function(DataMatrix, dict, theta, sigma)
+{
+  r = dim(DataMatrix)[1]
+  c = dim(DataMatrix)[2]
+  w = 252 # for one year without holidays
+  totaltime = r - w + 1
+  S <- findingSMatrix(DataMatrix, w)
+
+  # roMatrix
+  roMatrix <- findingroMatrix(S, totaltime,c)
+  
+  
+  ## till now we have made a matrix roMatrix such that roMatrix[1,,] indicates the first graph and so on
+  
+  ## Now we construct dMatrix
+  # another dmatrix by first choosing those which are larger than sigma 
+  
+  # another dmatrix
+  sMatrix  <- array(1, dim = c(totaltime, c, c))
+  for(i in 1:totaltime)
+  {
+    for(j in 1:c)
+    {   
+      for(k in 1:c)
+      {
+        df <- roMatrix[i,j,k]
+        if (abs(df) > sigma)
         {
-          dMatrix[i,j,k] = sqrt(2*(1-roMatrix[i,j,k]))
+          sMatrix[i,j,k] = dfunction(df)
         }
       }
     }
   }
   
-  
+  dMatrix <- findingdMatrix(sMatrix, totaltime,c,theta)
   
   #Ploting and working with graph from Here
   #https://sites.google.com/site/daishizuka/toolkits/sna/weighted-edges
@@ -179,7 +262,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   library(ape)
   #install.packages('TreeDist')
   library(TreeDist)
-
+  
   
   
   # every time we want to find the center of the mst of a graph
@@ -190,6 +273,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
   dista <- c()
   cc <- c()
   LCC <- c()
+  RCC<- c() # relative Clustering Coefficient
   
   for (j in 1:totaltime)
   {
@@ -226,7 +310,7 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     
     LCC<- append(LCC,LocalClusteringCoefficient(dMatrix[j,,],t))
     center <- append(center, dict[t])
-    
+    RCC <- append(RCC, RelativeClusteringCoefficient(dMatrix[j,,], sMatrix[j,,]))
     #center <- append(center, t)
     #print(which.min(maxdist))
     
@@ -238,10 +322,10 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     #   distancefromstar <- append(distancefromstar, 0)
     # }
     
-   
+    
     for (u in 1:c)
     {
-       sumcom <- sumcom + mycomination(degreevec[[u]], 2)
+      sumcom <- sumcom + mycomination(degreevec[[u]], 2)
     }
     distancefromstar <- append(distancefromstar, mycomination(degreevec[[t]],2)/sumcom)
     
@@ -261,18 +345,17 @@ SimpleReturnFunction <- function(DataMatrix, dict)
     
     
   }
-   
-   
+  
+  
   #plot (distancefromstar)
   write.csv(center, file = "/Users/asanapple/Desktop/Research/21-05-01/Simplereturncenters.csv")
   
   # The code has been completed but the only problem is that I assumed every mst has just one center. we can check at print(which.min(maxdist)).
   
-  newlist <- list(center, distancefromstar, dMatrix, dista,cc,LCC)# dista for distance between clustering
+  newlist <- list(center, distancefromstar, dMatrix, dista, cc, LCC, RCC)# dista for distance between clustering
   return(newlist)
-
-
 }
+
 
 
 LogReturnFunction <- function(DataMatrix, dict)
@@ -395,7 +478,7 @@ LogReturnFunction <- function(DataMatrix, dict)
   }
   
   return(center)
-
+  
   
 }
 
@@ -483,13 +566,10 @@ SimpleReturnFunctionUnsymmetric <- function(DataMatrix, dict) # is not complete
     }
     print(maxdist)
     t <- which(maxdist == min(maxdist))
-  
+    
     center <- append(center, dict[t])
   }
   
   return(center)
   
 }
-
-
-

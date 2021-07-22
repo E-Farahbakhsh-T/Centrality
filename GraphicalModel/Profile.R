@@ -37,6 +37,8 @@ dict <-  c("ABB.ST.Adj",# Industrials,1
 
 DataMatrix_dated = read.csv("/Users/asanapple/Desktop/Research/21-05-01/DataMatrixdated")
 
+
+
 # changing dates to Date format otherwise it is just string
 Dates = DataMatrix_dated[,1]
 aDates<-as.factor(Dates)
@@ -59,11 +61,19 @@ ConsumerDefensiveMatrix <- DataMatrix[, c(25)]
 dictFinancialServices<- c(15, 16, 19, 21, 24)
 
 
-plot(SimpleReturnFunction(FinancialServicesMatrix, dictFinancialServices)[[2]])
-data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28))
-plot(SimpleReturnFunction(ConsumerCyclicalMatrix, c(3,11,14))[[1]])
+plot(SimpleReturnFunction(FinancialServicesMatrix, dictFinancialServices, 1, 0)[[2]])
+data1<- SimpleReturnFunction(IndustrialsDatamatrix, c(1,2,4,5,6,17,20,22,23,28),1,0)
+plot(SimpleReturnFunction(ConsumerCyclicalMatrix, c(3,11,14),1,0)[[1]])
 
-Alldata <- SimpleReturnFunction(DataMatrix, c(1:columnno))
+
+sigma <- .3# >= 0
+theta = 2 # <= 1
+Alldata <- SimpleReturnFunction(DataMatrix, c(1:columnno), theta, sigma)
+plot(Alldata[[5]], pch="*")
+
+plot(Alldata[[1]], pch="*")
+frequency = table(Alldata[[1]])
+plot(frequency)
 
 
 # I want to plot this 
@@ -82,9 +92,9 @@ for(i in 1: 1004)
     sett <- append(sett, i)
   }
 }
-sett <- sett[1: (length(sett)-1)]
+#sett <- sett[1: (length(sett)-1)]
 
-WWWP <- Alldata[[4]]
+WWWP <- Alldata[[5]]
 #database<- cbind(bDates[1:(length(WWWP) - 1)], WWWP )
 database<- cbind(bDates[c(sett)], WWWP ) # just for distance bet trees in 30 days
 
@@ -103,9 +113,9 @@ ggplot(
 
 
 
-plot(Alldata[[4]], pch="*",type = "b") # type = b connected
+plot(Alldata[[5]], pch="*") # type = "b" connected
 # plot(Alldata[[6]], pch="*",type = "b") # type = b connected
-frequency = table(Alldata)
+frequency = table(Alldata[[1]])
 plot(frequency)
 plot(Alldata)
 # If you want to print them
